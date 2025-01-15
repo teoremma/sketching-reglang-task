@@ -1,0 +1,15 @@
+{"version": "1.1.0",
+ "packagesDir": ".lake/packages",
+ "packages":
+ [{"url": "https://github.com/rkthomps/sketching",
+   "type": "git",
+   "subDir": null,
+   "scope": "",
+   "rev": "ab065aea5e2211a4ab69e748d8cfb369af488cdf",
+   "name": "sketching",
+   "manifestFile": "lake-manifest.json",
+   "inputRev": "main",
+   "inherited": false,
+   "configFile": "lakefile.lean"}],
+ "name": "«sketching-reglang-task»",
+ "lakeDir": ".lake"}
