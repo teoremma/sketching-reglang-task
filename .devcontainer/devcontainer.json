@@ -4,6 +4,13 @@
     "dockerfile": "Dockerfile"
   },
   "customizations": {
+    "codespaces": {
+      "repositories": {
+        "rkthomps/sketching": {
+          "permissions": "read-all" 
+        }
+      }
+    },
     "vscode": {
       "settings": {
         "files.autoSave": "off"
