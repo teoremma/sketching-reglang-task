@@ -1,0 +1,1 @@
+{"file":"/workspaces/sketching-reglang-task/Task.lean","time":1737070140432,"baseTime":1737068762232,"changes":[{"range":{"start":{"line":128,"character":2},"end":{"line":128,"character":46}},"text":"\n  intro h\n  have : s = s ++ [] := by simp\n  rw [this]\n  apply accepts.starNonempty\n  · exact h\n  · exact accepts.starEmpty _","rangeOffset":2976,"rangeLength":44}]}

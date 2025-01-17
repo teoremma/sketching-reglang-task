@@ -1,0 +1,1 @@
+{"file":"/workspaces/sketching-reglang-task/Task.lean","time":1737069694003,"baseTime":1737068762232,"changes":[{"range":{"start":{"line":118,"character":2},"end":{"line":118,"character":73}},"text":"\n  exists ∅\n  intro s\n  constructor\n  · intro h\n    contradiction\n  · intro h\n    exact False.elim (rejects_emp s h)","rangeOffset":2788,"rangeLength":71}]}

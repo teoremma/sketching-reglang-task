@@ -1,0 +1,1 @@
+{"file":"/workspaces/sketching-reglang-task/Task.lean","time":1737069292350,"baseTime":1737068762232,"changes":[{"range":{"start":{"line":86,"character":2},"end":{"line":86,"character":12}},"text":"\n  apply accepts.starNonempty\n  · apply accepts.char\n  apply accepts.starNonempty\n  · apply accepts.char\n  apply accepts.starEmpty","rangeOffset":1990,"rangeLength":10}]}

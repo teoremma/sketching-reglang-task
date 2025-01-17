@@ -72,21 +72,29 @@ def reverse_lang (l : Language) := λ (s : String) => ∃ s', s.reverse = s' ∧
 
 -- PART 1 : Examples of Regular Expressions
 theorem ex1 : accepts (c(0) <|> c(1)) [c(1)] := by
-  sorry
+  apply accepts.unionRight
+  apply accepts.char
 
 theorem ex2 : accepts (c(0) <·> c(1)) ([c(0)] ++ [c(1)]) := by
-  sorry
+  apply accepts.concat
+  · apply accepts.char
+  · apply accepts.char
 
 theorem ex3 : accepts (c(1)*) [] := by
-  sorry
+  apply accepts.starEmpty
 
 theorem ex4 : accepts (c(1)*) ([c(1)] ++ ([c(1)] ++ [])) := by
-  sorry
+  apply accepts.starNonempty
+  · apply accepts.char
+  apply accepts.starNonempty
+  · apply accepts.char
+  apply accepts.starEmpty
 
 
 -- PART 2 : Warm up of `accepts`
 theorem cons_app : forall (a : α) (l : List α), a :: l = [a] ++ l := by
-  sorry
+  intros a l
+  rfl
 
 theorem accepts_concat : ∀ r₁ r₂ s₁ s₂, accepts r₁ s₁ → accepts r₂ s₂ → accepts (r₁ <·> r₂) (s₁ ++ s₂) := by
   sorry
@@ -101,39 +109,131 @@ theorem accepts_char : ∀ (c : Char) s, accepts c s → s = [c] := by
   sorry
 
 theorem rejects_emp : ∀ s, ¬ accepts ∅ s := by
-  sorry
+  intros s h
+  cases h
 
 theorem accepts_not_emp : ∀ r, (∃ s, accepts r s) → r ≠ ∅ := by
   sorry
 
 theorem empty_regular : is_regular empty := by
-  sorry
+  exists ∅
+  intro s
+  constructor
+  · intro h
+    contradiction
+  · intro h
+    exact False.elim (rejects_emp s h)
 
 theorem star_r : ∀ r s, accepts r s → accepts (r*) s := by
-  sorry
+  intro r s
+  intro h
+  have : s = s ++ [] := by simp
+  rw [this]
+  apply accepts.starNonempty
+  · exact h
+  · exact accepts.starEmpty _
 
 theorem union_comm : ∀ r₁ r₂ s, accepts (r₁ <|> r₂) s ↔ accepts (r₂ <|> r₁) s := by
-  sorry
+  intros r₁ r₂ s
+  constructor
+  · intro h
+    cases h
+    · apply accepts.unionRight
+      assumption
+    · apply accepts.unionLeft
+      assumption
+  · intro h
+    cases h
+    · apply accepts.unionRight
+      assumption
+    · apply accepts.unionLeft
+      assumption
 
 
 -- PART 3 : Regular Languages (through regular expressions)
 theorem accepts_exp_all : ∀ s, accepts exp_all s := by
-  sorry
+
+  intros s
+  induction s with
+  | nil => apply accepts.starEmpty
+  | cons hd tl ih =>
+                     rw [cons_app hd tl]
+                     apply accepts.starNonempty
+                     ·
+                       cases hd with
+                       | z =>
+                              apply accepts.unionLeft
+                              apply accepts.char
+                       | o =>
+                              apply accepts.unionRight
+                              apply accepts.char
+                     · exact ih
 
 theorem all_regular : is_regular all := by
-  sorry
+  exists exp_all
+  intro s
+  constructor
+  · intro _
+    apply accepts_exp_all
+  · intro _
+    trivial
 
 theorem union_regular : ∀ (l₁ l₂ : Language),
   is_regular l₁ →
   is_regular l₂ →
   is_regular (union_lang l₁ l₂) := by
-  sorry
+
+  intros l₁ l₂ h₁ h₂
+  cases h₁ with
+  | intro r₁ hr₁ =>
+    cases h₂ with
+    | intro r₂ hr₂ =>
+      exists (r₁ <|> r₂)
+      intro s
+      dsimp [union_lang]
+      constructor
+      · intro h
+        cases h
+        · apply accepts.unionLeft
+          rw [← hr₁]
+          assumption
+        · apply accepts.unionRight
+          rw [← hr₂]
+          assumption
+      · intro h
+        cases h
+        · left
+          rw [hr₁]
+          assumption
+        · right
+          rw [hr₂]
+          assumption
 
 theorem concat_regular : ∀ (l₁ l₂ : Language),
   is_regular l₁ →
   is_regular l₂ →
   is_regular (concat_lang l₁ l₂) := by
-  sorry
+
+  intros l₁ l₂ h₁ h₂
+  cases h₁ with
+  | intro r₁ hr₁ =>
+    cases h₂ with
+    | intro r₂ hr₂ =>
+      exists (r₁ <·> r₂)
+      intro s
+      dsimp [concat_lang]
+      constructor
+      · rintro ⟨s₁, s₂, h_eq, hl₁, hl₂⟩
+        rw [hr₁] at hl₁
+        rw [hr₂] at hl₂
+        rw [h_eq]
+        exact accepts.concat r₁ r₂ s₁ s₂ hl₁ hl₂
+      · intro h
+        cases h with
+        | concat _ _ s₁ s₂ h₁' h₂' =>
+          rw [← hr₁] at h₁'
+          rw [← hr₂] at h₂'
+          exact ⟨s₁, s₂, rfl, h₁', h₂'⟩
 
 
 -- PART 4 : Regularity of Reversal
@@ -146,11 +246,25 @@ def reverse : RegExp → RegExp
   | .concat r₁ r₂ => (reverse r₂) <·> (reverse r₁)
 
 def reverse_inv : ∀ r, reverse (reverse r) = r := by
-  sorry
+  intro r
+  induction r with
+  | emp => rfl
+  | eps => rfl
+  | char c => rfl
+  | star r ih => simp [reverse, ih]
+  | union r₁ r₂ ih₁ ih₂ => simp [reverse, ih₁, ih₂]
+  | concat r₁ r₂ ih₁ ih₂ => simp [reverse, ih₁, ih₂]
 
 -- PART 4 a : Inversion lemmas for reverse
 theorem reverse_invert_emp : ∀ r, reverse r = ∅ → r = ∅ := by
-  sorry
+  intro r h
+  cases r with
+  | emp => rfl
+  | eps => contradiction
+  | char _ => contradiction
+  | star _ => contradiction
+  | union _ _ => contradiction
+  | concat _ _ => contradiction
 
 theorem reverse_invert_eps : ∀ r, reverse r = ε → r = ε := by
   sorry
@@ -172,7 +286,12 @@ theorem reverse_invert_star : ∀ r r', reverse r = r'* → r = (reverse r')* :=
 
 -- PART 4 b : Proving reversal correct
 theorem lazy_star : ∀ r s₁ s₂, accepts (r*) s₁ → accepts r s₂ → accepts (r*) (s₁ ++ s₂) := by
-  sorry
+  intros r s₁ s₂ h₁ h₂
+  cases h₁ with
+  | starEmpty => apply accepts.starNonempty; sorry; sorry
+  | starNonempty r s₁' s₂' h₁' h₁'' =>
+    apply accepts.starNonempty; sorry
+    sorry;
 
 theorem reverse_correct_mp : ∀ r s, accepts r s → accepts (reverse r) (s.reverse) := by
   sorry

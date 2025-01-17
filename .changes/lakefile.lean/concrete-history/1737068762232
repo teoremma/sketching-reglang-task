@@ -1,0 +1,1 @@
+{"type":"new","contents":"import Lake\nopen Lake DSL\n\npackage \"sketching-reglang-task\" where\n  version := v!\"0.1.0\"\n\nrequire sketching from git \"https://github.com/rkthomps/sketching\" @ \"main\"\n","mtime":1737068762232}
